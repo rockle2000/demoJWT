@@ -10,9 +10,9 @@ import (
 var secretKey = os.Getenv("JWT_SECRET")
 
 type User struct {
-	Id       int
-	Username string
-	Password string
+	Id       int    `json:"id" form:"id"`
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
 }
 
 type claims struct {

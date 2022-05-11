@@ -12,3 +12,7 @@ type TokenPayload struct {
 	UserId   int    `json:"user_id"`
 	UserName string `json:"user_name"`
 }
+
+type AuthHeader struct {
+	IDToken string `header:"Authorization"`
+}
