@@ -2,12 +2,21 @@ package main
 
 import (
 	"DemoJWT/model"
+	"DemoJWT/tokenprovider"
+	"DemoJWT/tokenprovider/jwt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"strings"
 )
 
 func main() {
+	var secretKey = os.Getenv("JWT_SECRET")
+	//access token expire time - 15 minutes
+	atExpireTime := 60 * 15
+	//refresh token expire time - 7 days
+	rtExpireTime := 60 * 60 * 24 * 7
+
 	router := gin.Default()
 	router.POST("/login", func(c *gin.Context) {
 		var loginUser model.User
@@ -17,8 +26,12 @@ func main() {
 			})
 			return
 		}
-		expireTime := 60 * 60
-		token, err := loginUser.Generate(expireTime)
+		payload := tokenprovider.TokenPayload{
+			UserId:   loginUser.Id,
+			UserName: loginUser.Username,
+		}
+		provider := jwt.NewJWTProvider(secretKey)
+		token, err := provider.Generate(payload, atExpireTime, rtExpireTime)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -29,12 +42,7 @@ func main() {
 	})
 
 	router.GET("/verify", func(c *gin.Context) {
-		//h := model.AuthHeader{}
-		var user model.User
 		header := c.GetHeader("Authorization")
-		//if err := c.ShouldBindHeader(&h); err != nil {
-		//	fmt.Println(err)
-		//}
 		tokenHeader := strings.Split(header, " ")
 		if tokenHeader[0] != "Bearer" || len(tokenHeader) < 2 || strings.TrimSpace(tokenHeader[1]) == "" {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -42,7 +50,8 @@ func main() {
 			})
 			return
 		}
-		validate, err := user.Validate(tokenHeader[1])
+		provider := jwt.NewJWTProvider(secretKey)
+		validate, err := provider.Verify(tokenHeader[1])
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Invalid token",
