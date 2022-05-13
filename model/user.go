@@ -55,14 +55,14 @@ func (u User) Validate(myToken string) (*TokenPayload, error) {
 		return nil, err
 	}
 
-	// validate the token
+	// validate token
 	if !res.Valid {
 		return nil, errors.New("invalid Token")
 	}
 
 	claims, ok := res.Claims.(*claims)
 	if !ok {
-		return nil, errors.New("invalid Token 3")
+		return nil, errors.New("invalid Token")
 	}
 
 	return &claims.Payload, nil
