@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	//Test
 	var secretKey = os.Getenv("JWT_SECRET")
 	//access token expire time - 15 minutes
 	atExpireTime := 60 * 15
