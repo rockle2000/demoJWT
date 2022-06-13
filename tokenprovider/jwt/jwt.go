@@ -4,11 +4,14 @@ import (
 	"DemoJWT/tokenprovider"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"strings"
 	"time"
 )
 
 type jwtProvider struct {
 	secret string
+}
+type jwtConfig struct {
 }
 
 func NewJWTProvider(secret string) *jwtProvider {
@@ -76,4 +79,12 @@ func (j *jwtProvider) Verify(token string) (*tokenprovider.TokenPayload, error) 
 	}
 
 	return &claims.Payload, nil
+}
+
+func (j *jwtProvider) ExtractToken(header string) (string, error) {
+	tokenHeader := strings.Split(header, " ")
+	if tokenHeader[0] != "Bearer" || len(tokenHeader) < 2 || strings.TrimSpace(tokenHeader[1]) == "" {
+		return "", errors.New("invalid token")
+	}
+	return tokenHeader[1], nil
 }
