@@ -22,6 +22,7 @@ func main() {
 	fmt.Println("all named: ", allNamedRoles)
 	policy := cb.GetPolicy()
 	fmt.Println("all policy: ", policy)
+
 	router := gin.Default()
 	router.POST("/login", api.Login(listUser))
 	admin := router.Group("/admin").Use(middlewares.Authorization(cb))
